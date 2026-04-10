@@ -32,14 +32,13 @@
             width: 210mm;
             min-height: 297mm;
             background: white;
-            padding: 10mm;
+            padding: 8mm;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             border: 4px solid #000;
         }
 
-        /* Ajuste para ecrãs digitais (Telemóveis/Tablets) */
         @media screen and (max-width: 210mm) {
             .page { width: 100vw; border: none; padding: 10px; }
         }
@@ -48,15 +47,15 @@
         .header {
             text-align: center;
             border-bottom: 4px solid #000;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             padding-bottom: 10px;
         }
-        .header h1 { font-size: 45pt; margin: 0; text-transform: uppercase; }
-        .header p { font-size: 18pt; margin: 5px 0; font-weight: bold; }
+        .header h1 { font-size: clamp(24pt, 8vw, 45pt); margin: 0; text-transform: uppercase; }
+        .header p { font-size: clamp(14pt, 4vw, 18pt); margin: 5px 0; font-weight: bold; }
 
         /* 4. BLOCOS DE PERÍODO */
         .card {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             border: 3px solid #000;
             border-radius: 15px;
             overflow: hidden;
@@ -66,40 +65,63 @@
 
         .card-header {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             justify-content: center;
-            padding: 15px;
-            gap: 20px;
+            padding: 10px;
+            gap: 15px;
             border-bottom: 2px solid rgba(0,0,0,0.1);
         }
-        .icon-large { font-size: 60pt; line-height: 1; }
+        .icon-large { font-size: clamp(40pt, 12vw, 60pt); line-height: 1; }
         .title-group { text-align: center; }
-        .title-group h2 { font-size: 28pt; margin: 0; text-transform: uppercase; }
-        .title-group span { font-size: 18pt; font-weight: bold; opacity: 0.8; }
+        .title-group h2 { font-size: clamp(18pt, 6vw, 28pt); margin: 0; text-transform: uppercase; }
+        .title-group span { font-size: clamp(12pt, 4vw, 18pt); font-weight: bold; opacity: 0.8; }
 
-        /* 5. GRELHA DE MEDICAMENTOS (O SEGREDO DA ADAPTAÇÃO) */
+        /* 5. LINHA DE MEDICAMENTO (MELHORIA PARA EVITAR SOBREPOSIÇÃO) */
         .med-row {
-            display: grid;
-            /* Se houver espaço, faz 4 colunas iguais. Se não, quebra. */
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 10px;
-            padding: 15px;
+            display: flex;
+            flex-wrap: wrap; /* Permite que os itens desçam se não couberem lateralmente */
+            justify-content: space-around;
             align-items: center;
+            padding: 15px 10px;
             text-align: center;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
+            border-bottom: 2px solid rgba(0,0,0,0.05);
+            gap: 15px;
         }
         .med-row:last-child { border-bottom: none; }
 
-        /* Estilos de Texto */
-        .med-name { font-size: 26pt; font-weight: 900; line-height: 1.1; }
-        .med-mg { font-size: 14pt; font-weight: bold; color: #444; display: block; }
-        .med-qty { font-size: 24pt; font-weight: 900; color: var(--accent); }
+        /* Contentores individuais dentro da linha para forçar largura mínima */
+        .med-cell {
+            flex: 1 1 150px; /* Alarga até 1fr mas não encolhe menos de 150px */
+            min-width: fit-content;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .med-name { 
+            font-size: clamp(20pt, 5vw, 26pt); 
+            font-weight: 900; 
+            line-height: 1;
+            word-break: break-word;
+        }
+        .med-mg { font-size: 14pt; font-weight: bold; color: #444; margin-top: 4px; }
+        
+        .med-qty { 
+            font-size: clamp(18pt, 5vw, 24pt); 
+            font-weight: 900; 
+            color: var(--accent); 
+            white-space: nowrap;
+        }
+        
         .med-dialect { 
             font-size: 14pt; 
             font-weight: bold; 
-            background: rgba(0,0,0,0.05); 
-            padding: 5px; 
-            border-radius: 5px;
+            background: rgba(255,255,255,0.6); 
+            padding: 6px 10px; 
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
             display: inline-block;
         }
 
@@ -118,14 +140,14 @@
             font-size: 18pt;
             font-weight: bold;
             border-radius: 10px;
+            margin-top: 10px;
         }
 
-        /* AJUSTES ESPECÍFICOS PARA MOBILE PORTRAIT */
-        @media screen and (max-width: 600px) {
-            .med-name { font-size: 20pt; }
-            .med-qty { font-size: 18pt; }
-            .icon-large { font-size: 40pt; }
-            .header h1 { font-size: 30pt; }
+        /* AJUSTES PARA MOBILE EXTREMO */
+        @media screen and (max-width: 480px) {
+            .med-cell { flex: 1 1 100%; } /* Força um item por linha em ecrãs muito pequenos */
+            .med-row { padding: 10px 5px; gap: 8px; }
+            .med-dialect { font-size: 12pt; }
         }
     </style>
 </head>
@@ -149,24 +171,24 @@
             
             <div class="med-list">
                 <div class="med-row">
-                    <div class="med-name">PANTOC<span class="med-mg">40 mg</span></div>
-                    <div class="med-qty">1 Comp.</div>
-                    <div class="med-dialect">[Oi Dablättle]</div>
+                    <div class="med-cell"><div class="med-name">PANTOC</div><div class="med-mg">40 mg</div></div>
+                    <div class="med-cell"><div class="med-qty">1 Comp.</div></div>
+                    <div class="med-cell"><div class="med-dialect">[Oi Dablättle]</div></div>
                 </div>
                 <div class="med-row">
-                    <div class="med-name">VELMETIA<span class="med-mg">50/1000 mg</span></div>
-                    <div class="med-qty">1 Comp.</div>
-                    <div class="med-dialect">[Oi Dablättle]</div>
+                    <div class="med-cell"><div class="med-name">VELMETIA</div><div class="med-mg">50/1000 mg</div></div>
+                    <div class="med-cell"><div class="med-qty">1 Comp.</div></div>
+                    <div class="med-cell"><div class="med-dialect">[Oi Dablättle]</div></div>
                 </div>
                 <div class="med-row">
-                    <div class="med-name">LOSARTAN<span class="med-mg">50 mg</span></div>
-                    <div class="med-qty">1 Comp.</div>
-                    <div class="med-dialect">[Oi Dablättle]</div>
+                    <div class="med-cell"><div class="med-name">LOSARTAN</div><div class="med-mg">50 mg</div></div>
+                    <div class="med-cell"><div class="med-qty">1 Comp.</div></div>
+                    <div class="med-cell"><div class="med-dialect">[Oi Dablättle]</div></div>
                 </div>
                 <div class="med-row">
-                    <div class="med-name">LASIX<span class="med-mg">40 mg</span></div>
-                    <div class="med-qty">1 Comp.</div>
-                    <div class="med-dialect">[Oi Dablättle]</div>
+                    <div class="med-cell"><div class="med-name">LASIX</div><div class="med-mg">40 mg</div></div>
+                    <div class="med-cell"><div class="med-qty">1 Comp.</div></div>
+                    <div class="med-cell"><div class="med-dialect">[Oi Dablättle]</div></div>
                 </div>
             </div>
         </div>
@@ -181,9 +203,9 @@
                 </div>
             </div>
             <div class="med-row">
-                <div class="med-name">CONCOR<span class="med-mg">2,5 mg</span></div>
-                <div class="med-qty" style="color:#E65100">½ Comp.</div>
-                <div class="med-dialect">[A halbs Dablättle]</div>
+                <div class="med-cell"><div class="med-name">CONCOR</div><div class="med-mg">2,5 mg</div></div>
+                <div class="med-cell"><div class="med-qty" style="color:#E65100">½ Comp.</div></div>
+                <div class="med-cell"><div class="med-dialect">[A halbs Dablättle]</div></div>
             </div>
         </div>
 
@@ -198,14 +220,14 @@
             </div>
             <div class="med-list">
                 <div class="med-row">
-                    <div class="med-name">VELMETIA<span class="med-mg">50/1000 mg</span></div>
-                    <div class="med-qty">1 Comp.</div>
-                    <div class="med-dialect">[Oi Dablättle]</div>
+                    <div class="med-cell"><div class="med-name">VELMETIA</div><div class="med-mg">50/1000 mg</div></div>
+                    <div class="med-cell"><div class="med-qty">1 Comp.</div></div>
+                    <div class="med-cell"><div class="med-dialect">[Oi Dablättle]</div></div>
                 </div>
                 <div class="med-row">
-                    <div class="med-name">ATORVASTATINA<span class="med-mg">40 mg</span></div>
-                    <div class="med-qty">1 Comp.</div>
-                    <div class="med-dialect">[Oi Dablättle]</div>
+                    <div class="med-cell"><div class="med-name">ATORVASTATINA</div><div class="med-mg">40 mg</div></div>
+                    <div class="med-cell"><div class="med-qty">1 Comp.</div></div>
+                    <div class="med-cell"><div class="med-dialect">[Oi Dablättle]</div></div>
                 </div>
             </div>
         </div>
@@ -219,4 +241,3 @@
 </html>
 
 ```
-
